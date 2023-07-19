@@ -1,82 +1,48 @@
 <?php
 require('require/_bdd.php');
-
-// $month = new Datetime();
-
-// $query = $dbCo->prepare("SELECT t.name, t.date_transaction, t.amount, c.icon_class FROM transaction t JOIN category c ON c.id_category = t.id_category WHERE t.date_transaction LIKE :date ORDER BY  t.date_transaction DESC");
-// $query->execute(['date' => $month->format('Y-m') . '%']);
-// $detailCurrentMonth = $query->fetchAll();
-
-// foreach ($detailCurrentMonth as $arrayKey => $values) {
-
-//     echo '<td width="50" class="ps-3"><i class="bi bi-' . $values['icon_class'] . ' fs-3"></i></td>';
-//     echo '<td><time datetime="' . $values['date_transaction'] . '" class="d-block fst-italic fw-light">' . $values['date_transaction'] . '</time>Essence voiture</td>';
-//     echo '<td class="text-end"><span class="rounded-pill text-nowrap bg-warning-subtle px-2">' . $values['amount'] . '€</span></td>';
-//     echo '<td class="text-end text-nowrap">
-//         <a href="#" class="btn btn-outline-primary btn-sm rounded-circle">
-//             <i class="bi bi-pencil"></i>
-//         </a>
-//         <a href="#" class="btn btn-outline-danger btn-sm rounded-circle">
-//             <i class="bi bi-trash"></i>
-//         </a>
-//     </td>';
-// }
+require('require/_html.php');
 ?>
-
-<!DOCTYPE html>
-<html lang="fr">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opérations de Juillet 2023 - Mes Comptes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-</head>
 
 <body>
 
-    <div class="container-fluid">
-        <header class="row flex-wrap justify-content-between align-items-center p-3 mb-4 border-bottom">
-            <a href="index.php" class="col-1">
-                <i class="bi bi-piggy-bank-fill text-primary fs-1"></i>
-            </a>
-            <nav class="col-11 col-md-7">
-                <ul class="nav">
-                    <li class="nav-item">
-                        <a href="index.php" class="nav-link link-secondary" aria-current="page">Opérations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="summary.html" class="nav-link link-body-emphasis">Synthèses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="categories.html" class="nav-link link-body-emphasis">Catégories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="import.html" class="nav-link link-body-emphasis">Importer</a>
-                    </li>
-                </ul>
-            </nav>
-            <form action="" class="col-12 col-md-4" role="search">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Rechercher..." aria-describedby="button-search">
-                    <button class="btn btn-primary" type="submit" id="button-search">
-                        <i class="bi bi-search"></i>
-                    </button>
+    <?php
+    require('require/_header.php');
+    ?>
+
+    <div class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </form>
-        </header>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Sauvegarder changement(s)</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+
 
     <div class="container">
         <section class="card mb-4 rounded-3 shadow-sm">
             <div class="card-header py-3">
                 <h2 class="my-0 fw-normal fs-4">Solde aujourd'hui</h2>
             </div>
-            <div class="card-body">
-                <p class="card-title pricing-card-title text-center fs-1">625,34 €</p>
-            </div>
+            <?php
+            $query1 = $dbCo->prepare("SELECT SUM(`amount`) as total FROM `transaction` WHERE `date_transaction` NOT LIKE :date1");
+            $query1->execute(['date1' => '2023-08%']);
+            $totalAccount = $query1->fetchAll();
+
+            echo '<div class="card-body">';
+            echo '<p class="card-title pricing-card-title text-center fs-1">' . intval($totalAccount[0]['total']) . '€ </p>';
+            echo '</div>';
+            ?>
         </section>
 
         <section class="card mb-4 rounded-3 shadow-sm">
@@ -95,22 +61,20 @@ require('require/_bdd.php');
                     <tbody>
 
                         <?php
-                        require('require/_bdd.php');
-
 
                         $month = new Datetime();
 
-                        $query = $dbCo->prepare("SELECT t.name, t.date_transaction, t.amount, c.icon_class FROM transaction t JOIN category c ON c.id_category = t.id_category WHERE t.date_transaction LIKE :date ORDER BY  t.date_transaction DESC");
-                        $query->execute(['date' => $month->format('Y-m') . '%']);
-                        $detailCurrentMonth = $query->fetchAll();
+                        $query2 = $dbCo->prepare("SELECT t.ID_transaction, t.name, t.date_transaction, t.amount, c.icon_class FROM transaction t LEFT JOIN category c ON c.id_category = t.id_category WHERE t.date_transaction LIKE :date ORDER BY  t.date_transaction DESC");
+                        $query2->execute(['date' => $month->format('Y-m') . '%']);
+                        $detailCurrentMonth = $query2->fetchAll();
 
                         foreach ($detailCurrentMonth as $arrayKey => $values) {
-                            echo '<tr>';    
+                            echo '<tr>';
                             echo '<td width="50" class="ps-3"><i class="bi bi-' . $values['icon_class'] . ' fs-3"></i></td>';;
-                            echo '<td><time datetime="' . $values['date_transaction'] . '" class="d-block fst-italic fw-light">' . $values['date_transaction'] . '</time>Essence voiture</td>';
+                            echo '<td><time datetime="' . $values['date_transaction'] . '" class="d-block fst-italic fw-light">' . $values['date_transaction'] . '</time>' . $values['name'] . '</td>';
                             echo '<td class="text-end"><span class="rounded-pill text-nowrap bg-warning-subtle px-2">' . $values['amount'] . '€</span></td>';
-                            echo '<td class="text-end text-nowrap"><a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-pencil"></i></a><a href="#" class="btn btn-outline-danger btn-sm rounded-circle"><i class="bi bi-trash"></i></a></td>';
-                            echo '</tr>';    
+                            echo '<td class="text-end text-nowrap"><a href="modify.php?ID_transaction='.$values['ID_transaction'].'" class="btn btn-outline-primary btn-sm rounded-circle"><i class="bi bi-pencil"></i></a><a href="#" class="btn btn-outline-danger btn-sm rounded-circle"><i class="bi bi-trash"></i></a></td>';
+                            echo '</tr>';
                         }
                         ?>
                         <!-- <tr>
@@ -275,17 +239,12 @@ require('require/_bdd.php');
     </div>
 
     <div class="position-fixed bottom-0 end-0 m-3">
-        <a href="add.html" class="btn btn-primary btn-lg rounded-circle">
+        <a href="add.php" class="btn btn-primary btn-lg rounded-circle">
             <i class="bi bi-plus fs-1"></i>
         </a>
     </div>
 
-    <footer class="py-3 mt-4 border-top">
-        <p class="text-center text-body-secondary">© 2023 Mes comptes</p>
-    </footer>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+    <?php
+    require('require/_footer.php');
+    ?>
